@@ -1,37 +1,60 @@
-import java.util.*;
+import java.util.Scanner;
 
 public class Main {
 
-	static int[][] dp, num;
+	static int num;
+	static int[][] arr, dp;
+	static int min = 214700000;
 
 	public static void main(String[] args) {
+
 		Scanner sc = new Scanner(System.in);
 
-		int cnt = sc.nextInt();
-		num = new int[cnt][3];
-		dp = new int[cnt][3];
+		num = sc.nextInt();
+		arr = new int[num][3];
+		dp = new int[num][3];
 
-		for (int i = 0; i < cnt; i++) {
+		for (int i = 0; i < num; i++) {
 			for (int j = 0; j < 3; j++) {
-				num[i][j] = sc.nextInt();
+				arr[i][j] = sc.nextInt();
+				dp[i][j] = 214700000;
 			}
 		}
 
-		dp[0][0] = num[0][0];
-		dp[0][1] = num[0][1];
-		dp[0][2] = num[0][2];
+		dp[0][0] = arr[0][0];
+		dp[0][1] = arr[0][1];
+		dp[0][2] = arr[0][2];
 
-		System.out.println(Math.min(cost(cnt - 1, 0), Math.min(cost(cnt - 1, 1), cost(cnt - 1, 2))));
+		dfs(0, 1);
+		dfs(1, 1);
+		dfs(2, 1);
+
+		for (int i = 0; i < 3; i++) {
+			if (dp[num - 1][i] < min) min = dp[num - 1][i];
+		}
+		System.out.println(min);
 	}
 
-	private static int cost(int depth, int color) {
-
-		if (dp[depth][color] == 0) {
-			if (color == 0) dp[depth][0] = Math.min(cost(depth - 1, 1), cost(depth - 1, 2)) + num[depth][0];
-			else if (color == 1) dp[depth][1] = Math.min(cost(depth - 1, 0), cost(depth - 1, 2)) + num[depth][1];
-			else dp[depth][2] = Math.min(cost(depth - 1, 0), cost(depth - 1, 1)) + num[depth][2];
+	private static void dfs(int idx, int depth) {
+		if (depth == num) {
+			if (min > dp[depth - 1][idx]) min = dp[depth - 1][idx];
+		} else {
+			if (idx == 0) {
+				dp[depth][1] = arr[depth][1] + dp[depth - 1][idx];
+				dp[depth][2] = arr[depth][2] + dp[depth - 1][idx];
+				dfs(1, ++depth);
+				dfs(2, depth);
+			} else if (idx == 1) {
+				dp[depth][0] = arr[depth][0] + dp[depth - 1][idx];
+				dp[depth][2] = arr[depth][2] + dp[depth - 1][idx];
+				dfs(0, ++depth);
+				dfs(2, depth);
+			} else {
+				dp[depth][0] = arr[depth][0] + dp[depth - 1][idx];
+				dp[depth][1] = arr[depth][1] + dp[depth - 1][idx];
+				dfs(0, ++depth);
+				dfs(1, depth);
+			}
 		}
-
-		return dp[depth][color];
 	}
 }
